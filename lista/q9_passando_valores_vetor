@@ -1,0 +1,29 @@
+%include "io.inc"
+
+section .data
+    vetor1 DW 10, 20, 50, 80, 100, 5, 30, 45, 28, 8
+    tamanho DB ($ - vetor1) / 2
+    
+section .bss
+    vetor2 RESD 10
+
+section .text
+global CMAIN
+CMAIN:
+    mov ebp, esp; for correct debugging
+    ;write your code here
+    mov ECX, [tamanho]
+    mov EDI, vetor1
+    mov ESI, vetor2
+  
+PASS:
+    mov AX, [EDI]
+    movzx EAX, AX
+    mov [ESI], EAX
+    add EDI, 2
+    add ESI, 4
+    
+    LOOP PASS    
+    
+    xor eax, eax
+    ret

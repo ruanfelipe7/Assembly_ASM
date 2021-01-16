@@ -1,0 +1,26 @@
+%include "io.inc"
+
+section .text
+global CMAIN
+CMAIN:
+    mov ebp, esp; for correct debugging
+    ;write your code here
+    mov ECX, 6
+    mov AL, 1
+    mov BL, 0
+
+    PRINT_UDEC 1, AL           
+    NEWLINE
+    
+FIBONAC:  
+      mov DL, AL
+      add AL, BL
+      mov BL, DL  
+      PRINT_UDEC 1, AL
+      NEWLINE
+      DEC ECX
+      JNE FIBONAC
+    
+    
+    xor eax, eax
+    ret

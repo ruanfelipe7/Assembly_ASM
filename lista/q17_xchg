@@ -1,0 +1,23 @@
+%include "io.inc"
+
+section .text
+global CMAIN
+CMAIN:
+    mov ebp, esp; for correct debugging
+    ;write your code here
+    mov AL, 0xA
+    mov BL, 0xB
+    mov CL, 0xC
+    mov DL, 0xD
+    
+    xchg CL, BL
+    xchg CL, AL
+    xchg CL, DL
+    
+    PRINT_HEX 1, AL
+    PRINT_HEX 1, BL
+    PRINT_HEX 1, CL
+    PRINT_HEX 1, DL
+    
+    xor eax, eax
+    ret

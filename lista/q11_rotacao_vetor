@@ -1,0 +1,25 @@
+%include "io.inc"
+
+section .data
+    array DW 10,20,30,40,50
+    tamanho_do_array DB ($ - array)/2
+
+section .text
+global CMAIN
+CMAIN:
+    mov ebp, esp; for correct debugging
+    mov ECX, [tamanho_do_array]
+    mov ESI, 0
+    dec ECX
+    mov EDI, ECX
+ROTATE:
+    mov AX, [array+ESI*4]
+    xchg AX, [array+EDI*4]
+    mov [array+ESI*4], AX
+    inc ESI
+    LOOP ROTATE
+    
+    
+                
+    xor eax, eax
+    ret

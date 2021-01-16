@@ -1,0 +1,97 @@
+%include "io.inc"
+section .data
+    ajuda DD 0
+section .bss
+    res RESD 25
+section .text
+    size EQU 25
+global CMAIN
+CMAIN:
+    mov ebp, esp; for correct debugging
+    GET_DEC 4, EBX ;recebendo o numero do usuario
+    mov EAX, 0 ;zerando eax
+    mov ESI, (size-1)*4 ;movendo para o registrador de indice o valor 12 pra adicionar o numero na ultima posicao do vetor
+    mov [res+ESI], EBX; coloca-se o numero recebido na posicao do vetor
+    mov ECX, EBX ;inicia o contador 
+    dec ECX ;decresce um do contador pois o 1ºnumero ja esta la no vetor
+    jle F1F0
+    mov EDX, 0 ;zerando o contador de carry EDX 
+    mov EDI, 0 ;zera o registrador que vai verificar quando o numero passou de 32 bits
+    jmp FATORIAL ;pulando para a funcao fatorial
+ 
+ SAVE:
+    mov [res+ESI], EAX ;salva-se os dados em resultado no devido campo do vetor
+    ret        
+
+  CARRY:
+     sub ESI, 4 ;subtrai-se 4 do ESI para que seja salvo no local correto, (mais significativo)
+     mov EDX, [res+ESI] ;recebe o valor que havia na parte um pouco mais significativa
+     inc EDX    ; incrementa-se esse valor
+     push EAX   ; move o valor de eax para a pilha
+     mov EAX, EDX ;move o valor de EDX para a EAX para salvar na memoria o resultado
+     call SAVE ;chama a funcao de salvar
+     add ESI, 4 ;volta o valor de ESI original      
+     mov EDI, 1 ;move para EDI o valor 1 indicando que ocorreu um carry
+     pop EAX ;pega o antigo valor de EAX
+     jmp VOLTA_CARRY ;volta para o loop do fatorial                                
+
+FATORIAL:
+    mov EDX, ECX ;recebe o contador para o caso de chamar a funcao SOMAGRANDES
+    push ECX  ;guarda na pilha o contador  
+    sub EDI, 0  ;verifica se o valor de EDI é 0, se for nao precisa chamar a funcao SOMADEGRANDES
+    jnz SOMADEGRANDES ;se for maior que 0 chama a funcao SOMADEGRANDES
+    mov EAX, 0 ;se nao for zera o EAX para comecar as somas
+    mov EBX, [res+ESI] ;leva o valor a ser somado para EBX
+    SOMA1:
+        add EAX, EBX ;soma de eax com ebx
+        jc CARRY ;se houver carry chama a etiqueta do carry
+        VOLTA_CARRY:
+        loop SOMA1 ;loop para somar de acordo com o contador
+    call SAVE  ;chama a funcao para escrever o valor de volta na memoria em res e aux
+    CONTINUACAO:
+    mov EDX, 0 ;zera o edx para o caso de ter acontecido carrys       
+    pop ECX ;pega o valor da pilha e leva de volta para ecx
+    mov ESI, (size-1)*4 ;caso o valor de ESI tenha sido alterado ele volta o valor original
+    loop FATORIAL ;continua o loop do fatorial de acordo com o contador 
+   
+    PRINT:
+    mov ECX, size ;move para o contador o tamanho do array
+    mov ESI, 0 ;move para o indice ESI, o valor inicial 0
+    ESCREVE:
+        PRINT_HEX 4, [res+ESI] ;printa o resultado do fatorial
+        add ESI, 4 ;incrementa em 4 o valor de ESI, para pular pra proxima posição
+        loop ESCREVE
+    xor eax, eax
+    ret
+ 
+ F1F0:
+    mov EAX, 1
+    call SAVE
+    jmp PRINT
+  
+ SOMADEGRANDES: ;funcao para somar os numeros que nao cabem em 32 bits
+        mov ESI, size*4 ;leva o ESI para o fim
+        PRAMAISINTERNO:
+        mov ECX, [ajuda] ;caso haja carry recebe da variavel ajuda que armazenava esse valor
+        mov EAX, 0  ;zera o contador
+        mov [ajuda], EAX ;zera a variavel de ajuda
+        push EDX ;salva o valor de EDX, pois ele eh o contador dessa vez
+        sub ESI, 4 ;subtrai-se 4 do ESI para comecar as somas entre as respectivas posicoes do vetor
+        add EAX, ECX ;adiciona-se o carry caso haja
+        mov ECX, 0 ;zera o carry atual
+        SUM:
+            mov EBX, [res+ESI] ;move o valor para EBX
+            add EAX, EBX ;inicia-se as somas
+            jnc FINAL ;caso nao haja carry pula para o FINAL
+            inc ECX ;caso haja carry incrementa 1 no contador de carry ECX
+            FINAL:
+            dec EDX ;decrementa o contador do laço
+            jne SUM ;realiza o pulo enquanto o contador nao chegar em 0
+     mov [ajuda], ECX ;guarda na memoria em ajuda o valor de carry gerado pelas somas
+     mov [res+ESI], EAX  ;guarda o valor das somas em res
+     pop EDX             ;busca da pilha o valor de EDX
+     sub ESI, 0       ;espera ate que ESI tenha zerado
+     jnz PRAMAISINTERNO  ;enquanto nao executa o laco externo novamente    
+    jmp CONTINUACAO    ;ao acabar todos os lacos volta para o laco do fatorial
+    
+    

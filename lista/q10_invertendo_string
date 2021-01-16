@@ -1,0 +1,28 @@
+%include "io.inc"
+
+section .data
+    source DB "This is the source string", 0
+    tm EQU $ - source
+section .bss
+    target RESB tm
+
+section .text
+global CMAIN
+CMAIN:
+    mov ebp, esp; for correct debugging
+    ;write your code here
+    mov EDI, source+tm-2
+    mov ESI, target
+    mov ECX, tm-1
+PASS:
+    mov AL, [EDI]
+    mov [ESI], AL
+    inc ESI
+    dec EDI
+    LOOP PASS
+    mov AL, 0
+    mov [ESI], AL
+    PRINT_STRING target
+        
+    xor eax, eax
+    ret

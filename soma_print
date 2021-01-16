@@ -1,0 +1,13 @@
+%include "io.inc"
+
+section .text
+global CMAIN
+CMAIN:
+    mov ebp, esp; for correct debugging
+    ;write your code here
+    MOV EAX , 8
+    MOV EBX, 5
+    ADD EAX, EBX
+    PRINT_UDEC 4, EAX
+    xor eax, eax
+    ret
